@@ -1,6 +1,14 @@
 package org.chat.chessbackend.Entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -8,6 +16,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "games")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Game {
 
     public enum GameStatus{
@@ -46,6 +57,7 @@ public class Game {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "white_player_id", nullable = false)
+    @NotNull
     private User whitePlayer;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -53,25 +65,45 @@ public class Game {
     private User blackPlayer;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @NotNull
     private PlayerColor currentTurn;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @NotNull
     private GameStatus status;
 
     @Enumerated(EnumType.STRING)
     private GameResult result;
 
+    @Column(nullable = false)
+    @NotBlank
     private String currentFEN;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @NotNull
     private TimeControlType time;
 
+    @Column(nullable = false)
+    @NotNull
+    @PositiveOrZero
     private Integer whiteTimeRemaining;
+
+    @Column(nullable = false)
+    @NotNull
+    @PositiveOrZero
     private Integer blackTimeRemaining;
 
     private String forfeitReason;
 
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
     private Instant createdAt;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
     private Instant lastMovedAt;
 
     @OneToMany(mappedBy = "game", cascade = CascadeType.ALL, orphanRemoval = true)
